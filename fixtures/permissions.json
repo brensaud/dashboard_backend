@@ -57,7 +57,7 @@
     },
     {
         "model": "users.permission",
-        "pk": 7,
+        "pk": 8,
         "fields": {
             "name": "edit_orders"
         }
