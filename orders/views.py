@@ -1,12 +1,16 @@
+from typing import ClassVar
+from django.http import response
 from rest_framework import generics, mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.http import HttpResponse
 
 from config.pagination import CustomPagination
-from .models import Order
+from .models import Order, OrderItem
 from orders.serializers import OrderSerializer
 from users.authentication import JWTAuthentication
-
+import csv
 
 class OrderGenericAPIView(
     generics.GenericAPIView, 
@@ -29,3 +33,26 @@ class OrderGenericAPIView(
             })
         return self.list(request)
 
+
+
+class ExportAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    Permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        response = HttpResponse(content_type='text/csv')
+        response['content-Disposition'] = 'attachment; file_name=orders.csv'
+
+        orders = Order.objects.all()
+        writer = csv.writer(response)
+
+        writer.writerow(['ID', 'Name', 'Email', 'Product Title', 'Price', 'Quantity'])
+
+        for order in orders:
+            writer.writerow([order.id, order.name, order.email, '', '', ''])
+
+            orderItems = OrderItem.objects.all().filter(order_id=order.id)
+            for item in orderItems:
+                writer.writerow(['', '', '', item.product_title, item.price, item.quantity])
+
+        return response

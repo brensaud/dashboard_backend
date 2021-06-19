@@ -9,6 +9,9 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def name(self):
+        return self.first_name + ' ' + self.last_name
 
 
 class OrderItem(models.Model):
