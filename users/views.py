@@ -1,3 +1,4 @@
+from config.pagination import CustomPagination
 from django.contrib.auth.models import Permission
 from users.serializers import UserSerializer
 from rest_framework.decorators import api_view
@@ -152,15 +153,15 @@ class UserGenericAPIView(
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    pagination_class = CustomPagination
+
 
     def get(self, request, pk=None):
         if pk:
             return Response({
                 'data': self.retrieve(request, pk).data
             })
-        return Response({
-            'data': self.list(request).data
-        })
+        return self.list(request)
 
 
     def post(self, request):
