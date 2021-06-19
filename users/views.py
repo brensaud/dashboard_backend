@@ -4,13 +4,13 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import exceptions, viewsets
+from rest_framework import exceptions, viewsets, status
 
 from .authentication import generate_access_token, JWTAuthentication
-from .serializers import PermissionSerializer, UserSerializer
+from .serializers import PermissionSerializer, RoleSerializer, UserSerializer
 
 
-from .models import User
+from .models import Role, User
 
 @api_view(['POST'])
 def register(request):
@@ -97,11 +97,21 @@ class RoleViewSet(viewsets.ViewSet):
     Permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        pass
+        serializer = RoleSerializer(Role.objects.all(), many=True)
 
+        return Response({
+            'data': serializer.data
+        })
 
     def create(self, request):
-        pass
+        serializer = RoleSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save()
+        return Response({
+            'data': serializer.data
+        }, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
         pass

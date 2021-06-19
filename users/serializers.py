@@ -1,5 +1,6 @@
+from django.db.models import fields
 from rest_framework import serializers
-from .models import Permission, User
+from .models import Permission, Role, User
 
 
 class PermissionSerializer(serializers.ModelSerializer):
@@ -7,6 +8,28 @@ class PermissionSerializer(serializers.ModelSerializer):
         model = Permission
         fields = '__all__'
 
+
+class PermissionRelatedField(serializers.StringRelatedField):
+    def to_representation(self, value):
+        return PermissionSerializer(value).data
+
+    def to_internal_value(self, data):
+        return data
+
+class RoleSerializer(serializers.ModelSerializer):
+    permissions = PermissionRelatedField(many=True)
+
+    class Meta:
+        model = Role
+        fields = '__all__'
+
+    def create(self, validated_data):
+        permissions = validated_data.pop('permissions', None)
+        instance = self.Meta.model(**validated_data)
+        instance.save()
+        instance.permissions.add(*permissions)
+        instance.save()
+        return instance
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
