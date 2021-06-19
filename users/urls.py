@@ -1,7 +1,15 @@
 from users.models import Role
 from django.urls import path 
 
-from .views import PermissionAPIView, register, login, AuthenticatedUser, logout, RoleViewSet
+from .views import (
+    PermissionAPIView,
+    register, 
+    login, 
+    AuthenticatedUser, 
+    logout, 
+    RoleViewSet,
+    UserGenericAPIView
+)
 
 urlpatterns = [
     # path('users/', users),
@@ -10,6 +18,8 @@ urlpatterns = [
     path('logout', logout),
     path('user', AuthenticatedUser.as_view()),
     path('permissions', PermissionAPIView.as_view()),
+
+    # Viewsets for role
     path('roles', RoleViewSet.as_view({
         'get': 'list',
         'post': 'create'
@@ -18,5 +28,10 @@ urlpatterns = [
         'get': 'retrieve',
         'put': 'update',
         'delete': 'destroy'
-    }))
+    })),
+
+
+    # Gneric views
+    path('users', UserGenericAPIView.as_view()),
+    path('users/<str:pk>', UserGenericAPIView.as_view())
 ]

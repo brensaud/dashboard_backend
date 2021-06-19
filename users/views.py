@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import exceptions, viewsets, status
+from rest_framework import exceptions, viewsets, status, generics, mixins
 
 from .authentication import generate_access_token, JWTAuthentication
 from .serializers import PermissionSerializer, RoleSerializer, UserSerializer
@@ -114,11 +114,66 @@ class RoleViewSet(viewsets.ViewSet):
         }, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
-        pass
+        role = Role.objects.get(id=pk)
+        serializer = RoleSerializer(role)
+        return Response({
+            'data': serializer.data
+        })
 
     def update(self, request, pk=None):
-        pass 
+        role = Role.objects.get(pk=pk)
+        serializer = RoleSerializer(instance=role, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({
+            'data': serializer.data
+        }, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None):
-        pass
+        role = Role.objects.get(pk=pk)
+        role.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+
+
+class UserGenericAPIView(
+    generics.GenericAPIView, 
+    mixins.ListModelMixin, 
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin
+):
+    authentication_classes = [JWTAuthentication]
+    Permission_classes = [IsAuthenticated]
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+    def get(self, request, pk=None):
+        if pk:
+            return Response({
+                'data': self.retrieve(request, pk).data
+            })
+        return Response({
+            'data': self.list(request).data
+        })
+
+
+    def post(self, request):
+        return Response({
+            'data': self.create(request).data
+        })
+
+
+    def put(self, request, pk=None):
+        return Response({
+            'data': self.update(request, pk).data
+        })
+
+
+    def delete(self, request, pk=None):
+        return self.destroy(request, pk)
