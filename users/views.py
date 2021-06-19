@@ -55,11 +55,13 @@ def login(request):
     return response
 
 
+
 class AuthenticatedUser(APIView):
     authentication_classes = [JWTAuthentication]
     Permission_classes = [IsAuthenticated]
+    
     def get(self, request):
-        serializer = UserSerializer(request.user)
+        serializer = UserSerializer(request.user, many=True)
 
         return Response ({
             'data': serializer.data
