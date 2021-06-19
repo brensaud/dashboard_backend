@@ -8,7 +8,8 @@ django = "*"
 mysqlclient = "==2.0.1"
 django-mysql = "==3.9"
 djangorestframework = "*"
-psycopg2-binary = "*"
+django-cors-headers = "==3.5.0"
+pyjwt = "*"
 
 [dev-packages]
 
