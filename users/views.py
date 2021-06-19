@@ -68,4 +68,10 @@ class AuthenticatedUser(APIView):
 
 @api_view(['POST'])
 def logout(request):
-    
+    response = Response()
+    response.delete_cookie(key='jwt')
+    response.data =  {
+        'message': 'Success'
+    }
+
+    return response
