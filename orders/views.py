@@ -1,4 +1,5 @@
 from typing import ClassVar
+from django.db import connection
 from django.http import response
 from rest_framework import generics, mixins
 from rest_framework.permissions import IsAuthenticated
@@ -11,6 +12,7 @@ from .models import Order, OrderItem
 from orders.serializers import OrderSerializer
 from users.authentication import JWTAuthentication
 import csv
+from django.db import connection
 
 class OrderGenericAPIView(
     generics.GenericAPIView, 
@@ -56,3 +58,24 @@ class ExportAPIView(APIView):
                 writer.writerow(['', '', '', item.product_title, item.price, item.quantity])
 
         return response
+
+
+
+class ChartAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    Permission_classes = [IsAuthenticated]
+
+    def get(self, _):
+        with connection.cursor() as cursor:
+            cursor.execute(""" 
+                SELECT DATE_FORMAT(o.created_at, '%Y-%m-%d') as date, sum(i.quantity * i.price) as sum
+                FROM orders_order as o
+                JOIN orders_orderitem as i ON o.id = i.order_id
+                GROUP BY date
+            """)
+
+            row = cursor.fetchall()
+
+            return Response({
+                'data': row
+            })
