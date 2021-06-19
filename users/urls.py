@@ -3,12 +3,14 @@ from django.urls import path
 
 from .views import (
     PermissionAPIView,
+    ProfilePasswordAPIView,
     register, 
     login, 
     AuthenticatedUser, 
     logout, 
     RoleViewSet,
-    UserGenericAPIView
+    UserGenericAPIView,
+    profileInfoAPIView,
 )
 
 urlpatterns = [
@@ -29,6 +31,12 @@ urlpatterns = [
         'put': 'update',
         'delete': 'destroy'
     })),
+
+
+
+    path('users/info', profileInfoAPIView.as_view()),
+    path('users/password', ProfilePasswordAPIView.as_view()),
+
 
 
     # Gneric views
