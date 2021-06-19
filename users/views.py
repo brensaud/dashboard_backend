@@ -1,3 +1,4 @@
+from users.permissions import ViewPermissions
 from config.pagination import CustomPagination
 from django.contrib.auth.models import Permission
 from users.serializers import UserSerializer
@@ -8,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import exceptions, viewsets, status, generics, mixins
 
 from .authentication import generate_access_token, JWTAuthentication
-from .serializers import PermissionSerializer, RoleSerializer, UserSerializer
+from .serializers import PermissionRelatedField, PermissionSerializer, RoleSerializer, UserSerializer
 
 
 from .models import Role, User
@@ -95,7 +96,8 @@ class PermissionAPIView(APIView):
 
 class RoleViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
-    Permission_classes = [IsAuthenticated]
+    Permission_classes = [IsAuthenticated & ViewPermissions]
+    permission_object = 'roles'
 
     def list(self, request):
         serializer = RoleSerializer(Role.objects.all(), many=True)
@@ -148,7 +150,8 @@ class UserGenericAPIView(
     mixins.DestroyModelMixin
 ):
     authentication_classes = [JWTAuthentication]
-    Permission_classes = [IsAuthenticated]
+    Permission_classes = [IsAuthenticated & ViewPermissions]
+    permission_object = "users"
 
     queryset = User.objects.all()
     serializer_class = UserSerializer

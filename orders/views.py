@@ -75,7 +75,10 @@ class ChartAPIView(APIView):
             """)
 
             row = cursor.fetchall()
-
-            return Response({
-                'data': row
-            })
+        data =[{
+            'date': result[0],
+            'sum': result[1]
+        } for result in row]
+        return Response({
+            'data': data
+        })
