@@ -27,13 +27,6 @@ def register(request):
     return Response(serializer.data)
 
 
-# @api_view(['GET'])
-# def users(request):
-#     serializer = UserSerializer(User.objects.all(), many=True)
-#     return Response(serializer.data)
-
-
-
 @api_view(['POST'])
 def login(request):
     email = request.data.get('email')

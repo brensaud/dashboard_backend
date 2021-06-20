@@ -41,7 +41,7 @@ class RoleRelatedField(serializers.RelatedField):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    role = RoleRelatedField(many=False,queryset=Role.objects.all())
+    role = RoleRelatedField(many=False,queryset=Role.objects.all(), required=False)
     class Meta:
         model= User 
         fields = ['id', 'first_name', 'last_name', 'email', 'password', 'role']
